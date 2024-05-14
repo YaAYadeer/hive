@@ -47,7 +47,10 @@ public class BenchmarkUtils {
                     .withType(TableType.MANAGED_TABLE)
                     .withColumns(columns)
                     .withPartitionKeys(partitions)
-                    .withParameter("transactional","true")    
+                    .withParameter("transactional","true")
+                    .withInputFormat("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat")
+                    .withOutputFormat("org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat")
+                    .withSerde("org.apache.hadoop.hive.ql.io.orc.OrcSerde")
                     .build())));
   }
 
@@ -65,6 +68,9 @@ public class BenchmarkUtils {
             .withColumns(createSchema(Collections.singletonList("name:string")))
             .withPartitionKeys(createSchema(Collections.singletonList("date")))
             .withParameter("transactional","true")
+            .withInputFormat("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat")
+            .withOutputFormat("org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat")
+            .withSerde("org.apache.hadoop.hive.ql.io.orc.OrcSerde")    
             .build()));
   }
 
