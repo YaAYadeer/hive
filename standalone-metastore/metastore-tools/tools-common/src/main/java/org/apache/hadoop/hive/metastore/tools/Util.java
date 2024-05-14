@@ -245,7 +245,7 @@ public final class Util {
     }
 
     static Table buildDefaultTable(String dbName, String tableName) {
-      return new TableBuilder(dbName, tableName).build();
+      return new TableBuilder(dbName, tableName).withParameter("transactional","true").build();
     }
 
     TableBuilder withType(TableType tabeType) {
