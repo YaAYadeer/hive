@@ -47,6 +47,7 @@ public class BenchmarkUtils {
                     .withType(TableType.MANAGED_TABLE)
                     .withColumns(columns)
                     .withPartitionKeys(partitions)
+                    .withParameter("transactional","true")    
                     .build())));
   }
 
@@ -63,6 +64,7 @@ public class BenchmarkUtils {
             .withType(TableType.MANAGED_TABLE)
             .withColumns(createSchema(Collections.singletonList("name:string")))
             .withPartitionKeys(createSchema(Collections.singletonList("date")))
+            .withParameter("transactional","true")
             .build()));
   }
 
