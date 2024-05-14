@@ -265,9 +265,7 @@ public class BenchmarkTool implements Runnable {
         .add("renameTable",
             () -> benchmarkRenameTable(bench, bData, 1))
         .add("dropDatabase",
-            () -> benchmarkDropDatabase(bench, bData, 1))
-        .add("openTxn",
-            () -> benchmarkOpenTxns(bench, bData, 1));
+            () -> benchmarkDropDatabase(bench, bData, 1));
 
     for (int howMany: instances) {
       suite.add("listTables" + '.' + howMany,
@@ -289,9 +287,7 @@ public class BenchmarkTool implements Runnable {
           .add("renameTable" + '.' + howMany,
               () -> benchmarkRenameTable(bench, bData, howMany))
           .add("dropDatabase" + '.' + howMany,
-              () -> benchmarkDropDatabase(bench, bData, howMany))
-          .add("openTxns" + '.' + howMany,
-              () -> benchmarkOpenTxns(bench, bData, howMany));
+              () -> benchmarkDropDatabase(bench, bData, howMany));
     }
 
     List<String> toRun = suite.listMatching(matches, exclude);
