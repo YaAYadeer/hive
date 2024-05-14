@@ -245,7 +245,11 @@ public final class Util {
     }
 
     static Table buildDefaultTable(String dbName, String tableName) {
-      return new TableBuilder(dbName, tableName).withParameter("transactional","true").build();
+      return new TableBuilder(dbName, tableName).withParameter("transactional","true")
+              .withInputFormat("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat")
+              .withOutputFormat("org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat")
+              .withSerde("org.apache.hadoop.hive.ql.io.orc.OrcSerde")
+              .build();
     }
 
     TableBuilder withType(TableType tabeType) {
