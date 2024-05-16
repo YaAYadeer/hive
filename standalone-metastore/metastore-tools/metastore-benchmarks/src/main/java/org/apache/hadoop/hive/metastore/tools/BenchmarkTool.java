@@ -149,7 +149,7 @@ public class BenchmarkTool implements Runnable {
   private Pattern[] exclude;
 
   @Option(names = {"--runMode"},
-      description = "flag for setting the mode for the benchmark, acceptable values are: ACID, NONACID, ALL")
+      description = "flag for setting the mode for the benchmark, acceptable values are: ACID, NONACID, NONACIDWITHNUM ,ALL")
   private RunModes runMode = RunModes.ALL;
 
   public static void main(String[] args) {
@@ -198,10 +198,11 @@ public class BenchmarkTool implements Runnable {
       case NONACIDWITHNUM:
         try {
           runNonAcidBenchmarkswithnum();
+          break;
         } catch (Exception e) {
           e.printStackTrace();
-        } 
-        break;
+          break;
+        }
       case ALL:
       default:
         runNonAcidBenchmarks();
@@ -259,12 +260,13 @@ public class BenchmarkTool implements Runnable {
 
     long startTime = System.currentTimeMillis();
     for (int i = 1; i <= nThreads; i++) {
-      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,instances,dbName+Integer.toString(i),tableName,warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile,doSanitize,matches,exclude);
+      System.out.println("start for thread" + Integer.toString(i));
+      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,host,port,confDir,instances,dbName+Integer.toString(i),tableName,warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile,doSanitize,matches,exclude);
       pool.execute(runnable);
+      System.out.println("execute for thread" + Integer.toString(i));
     }
     endCdl.await();
     long endTime = System.currentTimeMillis();
-
     System.out.println("Taken time: " + (endTime - startTime) + " ms");
   }
   

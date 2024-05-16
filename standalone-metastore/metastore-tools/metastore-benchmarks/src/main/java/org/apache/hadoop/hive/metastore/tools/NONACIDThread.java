@@ -32,42 +32,48 @@ import static org.apache.hadoop.hive.metastore.tools.Util.getServerUri;
 public class NONACIDThread implements Runnable{
     
     private static final Logger LOG = LoggerFactory.getLogger(NONACIDThread.class);
-    // HMS地址
+    // HMS地址  14
     private String host;
     private Integer port;
     private String confDir;
-    // 结果文件
-    private String dataSaveDir;
-    private String outputFile;
+    // 表数 分区数
+    private int[] instances;
+    // 必备成员
+    private BenchData bData;
+    private MicroBenchmark bench;
+    private StringBuilder sb = new StringBuilder();
+    private BenchmarkSuite suite = new BenchmarkSuite();
     // 进程相关
     private CountDownLatch startDownLatch;
     private CountDownLatch endCountDownLatch;
-    private StringBuilder sb = new StringBuilder();
-    private BenchmarkSuite suite = new BenchmarkSuite();
-    private BenchData bData;
-    private MicroBenchmark bench;
     private Pattern[] matches;
     private Pattern[] exclude;
-    // 表数 分区数
-    private int[] instances;
+    // 结果文件
+    private String dataSaveDir;
+    private String outputFile;
     
-    
-    public NONACIDThread(CountDownLatch startDownLatch, CountDownLatch endCountDownLatch,int[] instances,
-                         String dbName,String tableName,int warmup,int spinCount,String dataSaveDir,String outputFile, boolean doSanitize,Pattern[] matches,Pattern[] exclude) {
+    public NONACIDThread(CountDownLatch startDownLatch, CountDownLatch endCountDownLatch,
+                         String host,Integer port,String confDir,
+                         int[] instances, String dbName,String tableName,
+                         int warmup,int spinCount,String dataSaveDir,String outputFile, boolean doSanitize,Pattern[] matches,Pattern[] exclude) {
         this.startDownLatch = startDownLatch;
         this.endCountDownLatch = endCountDownLatch;
-        this.dataSaveDir=dataSaveDir;
-        this.outputFile = outputFile;
+        this.host=host;
+        this.port=port;
+        this.confDir=confDir;
         this.instances = instances;
         this.bData = new BenchData(dbName, tableName);
         this.bench = new MicroBenchmark(warmup, spinCount);
         this.matches = matches;
         this.exclude = exclude;
+        this.dataSaveDir=dataSaveDir;
+        this.outputFile = outputFile;
         suite.setScale(TimeUnit.MILLISECONDS).doSanitize(doSanitize);
     }
     
     public void setup() {
         // suite.add ?
+        
         suite.add("getNid", () -> benchmarkGetNotificationId(bench, bData));
         for (int howMany: instances) {
             suite.add("listTables" + '.' + howMany, () -> benchmarkListTables(bench, bData, howMany));
