@@ -259,9 +259,8 @@ public class BenchmarkTool implements Runnable {
     CountDownLatch endCdl = new CountDownLatch(poolSize);
 
     long startTime = System.currentTimeMillis();
-    for (int i = 1; i <= poolSize; i++) {  
-      // 补充线程需要执行的东西
-      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,instances,dbName,tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude);
+    for (int i = 1; i <= poolSize; i++) {
+      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,instances,dbName+Integer.toString(i),tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude);
       pool.execute(runnable);
     }
     endCdl.await();
