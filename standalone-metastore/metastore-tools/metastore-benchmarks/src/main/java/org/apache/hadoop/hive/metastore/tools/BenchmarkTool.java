@@ -29,6 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
+import org.apache.thrift.TException;
+
+import javax.security.auth.login.LoginException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -39,6 +42,9 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -214,11 +220,11 @@ public class BenchmarkTool implements Runnable {
         ACIDBenchmarks.TestGetValidWriteIds.class.getSimpleName(),
         ACIDBenchmarks.TestAllocateTableWriteIds.class.getSimpleName()
     };
-
+    // 要执行的case
     for (String pattern : Util.filterMatches(Arrays.asList(candidates), matches, exclude)) {
       optsBuilder = optsBuilder.include(pattern);
     }
-
+    // 加参
     Options opts =
         optsBuilder
             .param("howMany", Arrays.stream(instances)
@@ -235,6 +241,33 @@ public class BenchmarkTool implements Runnable {
     }
   }
 
+  public void runNonAcidBenchmarkswithnum() throws InterruptedException, TException, LoginException, IOException {
+    int poolSize = nThreads;
+
+    //int startId = Integer.parseInt(args[1]);  //并发数
+
+    int loop = 1;
+
+    ExecutorService pool = Executors.newCachedThreadPool();
+    CountDownLatch cdl = new CountDownLatch(poolSize);
+    CountDownLatch endCdl = new CountDownLatch(poolSize);
+
+    long startTime = System.currentTimeMillis();
+    for (int i = 0; i < poolSize; i++) {  //线程
+      // 补充线程需要执行的东西
+      
+      //CreateDatabaseThread runnable = new CreateDatabaseThread(cdl, endCdl, "threadName-" + i, startId + i);
+      pool.execute(runnable);
+    }
+    endCdl.await();
+    long endTime = System.currentTimeMillis();
+
+    System.out.println("poolSize: " + poolSize);
+    System.out.println("Taken time: " + (endTime - startTime) + " ms");  // TODO loop含义？
+    System.out.println("QPS: " + ((double)(poolSize * loop)/(double)(endTime - startTime) * 1000) + " req/s");
+
+  }
+  
   private void runNonAcidBenchmarks() {
     StringBuilder sb = new StringBuilder();
     BenchData bData = new BenchData(dbName, tableName);
@@ -294,19 +327,20 @@ public class BenchmarkTool implements Runnable {
     if (toRun.isEmpty()) {
       return;
     }
+    // list matching benchmarks
     if (doList) {
       toRun.forEach(System.out::println);
       return;
     }
-
     LOG.info("Using table '{}.{}", dbName, tableName);
 
     try (HMSClient client = new HMSClient(getServerUri(host, String.valueOf(port)), confDir)) {
       bData.setClient(client);
+      // 创建指定数据库
       if (!client.dbExists(dbName)) {
         client.createDatabase(dbName);
       }
-
+      
       if (client.tableExists(dbName, tableName)) {
         client.dropTable(dbName, tableName);
       }
@@ -315,6 +349,7 @@ public class BenchmarkTool implements Runnable {
       BenchmarkSuite result = suite.runMatching(matches, exclude);
 
       Formatter fmt = new Formatter(sb);
+      // 展示为csv形式
       if (doCSV) {
         result.displayCSV(fmt, csvSeparator);
       } else {
