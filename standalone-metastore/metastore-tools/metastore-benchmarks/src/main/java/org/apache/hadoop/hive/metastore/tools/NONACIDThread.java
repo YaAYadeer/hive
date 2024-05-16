@@ -20,7 +20,6 @@ public class NONACIDThread implements Runnable{
     private Integer port;
     private String confDir;
     // 结果文件
-    private String csvSeparator = "\t";
     private String dataSaveDir;
     private String outputFile;
     // 进程相关
@@ -74,7 +73,7 @@ public class NONACIDThread implements Runnable{
 
             Formatter fmt = new Formatter(sb);
             // 展示为csv形式
-            result.displayCSV(fmt, csvSeparator);
+            result.displayCSV(fmt,BenchmarkTool.CSV_SEPARATOR);
 
             PrintStream output = System.out;
             if (outputFile != null) {
@@ -111,7 +110,6 @@ public class NONACIDThread implements Runnable{
                 startDownLatch.countDown();
             }
             startDownLatch.await();
-//          执行进程验证
             testcase();
         } catch (InterruptedException e) {
             e.printStackTrace();

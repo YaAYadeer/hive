@@ -84,11 +84,12 @@ import static picocli.CommandLine.Option;
 public class BenchmarkTool implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(BenchmarkTool.class);
   private static final TimeUnit scale = TimeUnit.MILLISECONDS;
-  private static final String CSV_SEPARATOR = "\t";
+  public static final String CSV_SEPARATOR = "\t";
   private static final String TEST_TABLE = "bench_table";
   private enum RunModes {
     ACID,
     NONACID,
+    NONACIDWITHNUM,
     ALL
   }
 
@@ -194,6 +195,13 @@ public class BenchmarkTool implements Runnable {
       case NONACID:
         runNonAcidBenchmarks();
         break;
+      case NONACIDWITHNUM:
+        try {
+          runNonAcidBenchmarkswithnum();
+        } catch (Exception e) {
+          e.printStackTrace();
+        } 
+        break;
       case ALL:
       default:
         runNonAcidBenchmarks();
@@ -240,32 +248,26 @@ public class BenchmarkTool implements Runnable {
       LOG.error(e.getMessage(), e);
     }
   }
-
+  
+  //(cdl,endCdl,instances,dbName,tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude)
   public void runNonAcidBenchmarkswithnum() throws InterruptedException, TException, LoginException, IOException {
     int poolSize = nThreads;
-
     //int startId = Integer.parseInt(args[1]);  //并发数
-
-    int loop = 1;
-
+    
     ExecutorService pool = Executors.newCachedThreadPool();
     CountDownLatch cdl = new CountDownLatch(poolSize);
     CountDownLatch endCdl = new CountDownLatch(poolSize);
 
     long startTime = System.currentTimeMillis();
-    for (int i = 0; i < poolSize; i++) {  //线程
+    for (int i = 1; i <= poolSize; i++) {  
       // 补充线程需要执行的东西
-      
-      //CreateDatabaseThread runnable = new CreateDatabaseThread(cdl, endCdl, "threadName-" + i, startId + i);
+      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,instances,dbName,tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude);
       pool.execute(runnable);
     }
     endCdl.await();
     long endTime = System.currentTimeMillis();
 
-    System.out.println("poolSize: " + poolSize);
-    System.out.println("Taken time: " + (endTime - startTime) + " ms");  // TODO loop含义？
-    System.out.println("QPS: " + ((double)(poolSize * loop)/(double)(endTime - startTime) * 1000) + " req/s");
-
+    System.out.println("Taken time: " + (endTime - startTime) + " ms");
   }
   
   private void runNonAcidBenchmarks() {
