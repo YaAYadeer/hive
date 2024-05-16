@@ -251,16 +251,15 @@ public class BenchmarkTool implements Runnable {
   
   //(cdl,endCdl,instances,dbName,tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude)
   public void runNonAcidBenchmarkswithnum() throws InterruptedException, TException, LoginException, IOException {
-    int poolSize = nThreads;
     //int startId = Integer.parseInt(args[1]);  //并发数
     
     ExecutorService pool = Executors.newCachedThreadPool();
-    CountDownLatch cdl = new CountDownLatch(poolSize);
-    CountDownLatch endCdl = new CountDownLatch(poolSize);
+    CountDownLatch cdl = new CountDownLatch(nThreads);
+    CountDownLatch endCdl = new CountDownLatch(nThreads);
 
     long startTime = System.currentTimeMillis();
-    for (int i = 1; i <= poolSize; i++) {
-      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,instances,dbName+Integer.toString(i),tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude);
+    for (int i = 1; i <= nThreads; i++) {
+      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,instances,dbName+Integer.toString(i),tableName,warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile,doSanitize,matches,exclude);
       pool.execute(runnable);
     }
     endCdl.await();
