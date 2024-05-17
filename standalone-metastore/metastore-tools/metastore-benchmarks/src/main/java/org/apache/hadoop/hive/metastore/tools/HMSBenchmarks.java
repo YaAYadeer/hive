@@ -111,10 +111,10 @@ final class HMSBenchmarks {
         () -> throwingSupplierWrapper(() -> client.dropTable(dbName, tableName)),
         null);
   }
-
+  // int tableCount
   static DescriptiveStatistics benchmarkGetTable(@NotNull MicroBenchmark bench,
-                                                 @NotNull BenchData data,
-                                                 int tableCount) {
+                                                 @NotNull BenchData data
+                                                 ) {
     final HMSClient client = data.getClient();
     String dbName = data.dbName;
     String tableName = data.tableName;
