@@ -38,6 +38,8 @@ public class NONACIDThread implements Runnable{
     private String confDir;
     // 表数 分区数
     private int[] instances;
+    private int tnum;
+    private int[] nParameters;
     // 必备成员
     private BenchData bData;
     private MicroBenchmark bench;
@@ -54,7 +56,7 @@ public class NONACIDThread implements Runnable{
     
     public NONACIDThread(CountDownLatch startDownLatch, CountDownLatch endCountDownLatch,
                          String host,Integer port,String confDir,
-                         int[] instances, String dbName,String tableName,
+                         int[] instances, String dbName,String tableName,int tnum,int[] nParameters,
                          int warmup,int spinCount,String dataSaveDir,String outputFile, boolean doSanitize,Pattern[] matches,Pattern[] exclude) {
         this.startDownLatch = startDownLatch;
         this.endCountDownLatch = endCountDownLatch;
@@ -62,8 +64,10 @@ public class NONACIDThread implements Runnable{
         this.port=port;
         this.confDir=confDir;
         this.instances = instances;
+        this.nParameters = nParameters;
         this.bData = new BenchData(dbName, tableName);
         this.bench = new MicroBenchmark(warmup, spinCount);
+        this.tnum=tnum;
         this.matches = matches;
         this.exclude = exclude;
         this.dataSaveDir=dataSaveDir;
@@ -71,12 +75,11 @@ public class NONACIDThread implements Runnable{
         suite.setScale(TimeUnit.MILLISECONDS).doSanitize(doSanitize);
     }
     
+    
     public void setup() {
-        // suite.add ?
-        
-        suite.add("getNid", () -> benchmarkGetNotificationId(bench, bData));
         for (int howMany: instances) {
-            suite.add("listTables" + '.' + howMany, () -> benchmarkListTables(bench, bData, howMany));
+            suite.add()
+                    
         }
     }
     public void testcase() {

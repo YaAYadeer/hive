@@ -113,11 +113,11 @@ final class HMSBenchmarks {
   }
 
   static DescriptiveStatistics benchmarkGetTable(@NotNull MicroBenchmark bench,
-                                                 @NotNull BenchData data) {
+                                                 @NotNull BenchData data,
+                                                 int tableCount) {
     final HMSClient client = data.getClient();
     String dbName = data.dbName;
     String tableName = data.tableName;
-
     BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
     try {
       return bench.measure(() ->

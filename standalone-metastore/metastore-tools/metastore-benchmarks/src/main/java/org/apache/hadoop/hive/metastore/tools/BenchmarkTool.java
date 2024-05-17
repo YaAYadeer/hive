@@ -92,7 +92,7 @@ public class BenchmarkTool implements Runnable {
     NONACIDWITHNUM,
     ALL
   }
-
+  
 
   @Option(names = {"-H", "--host"}, description = "HMS Host", paramLabel = "URI")
   private String host;
@@ -147,6 +147,9 @@ public class BenchmarkTool implements Runnable {
 
   @Option(names = {"-E", "--exclude"}, description = "test name patterns to exclude")
   private Pattern[] exclude;
+
+  @Option(names = {"-TN", "--tnumber"}, description = "num of table")
+  private int tnum;
 
   @Option(names = {"--runMode"},
       description = "flag for setting the mode for the benchmark, acceptable values are: ACID, NONACID, NONACIDWITHNUM ,ALL")
@@ -249,7 +252,6 @@ public class BenchmarkTool implements Runnable {
       LOG.error(e.getMessage(), e);
     }
   }
-  
   //(cdl,endCdl,instances,dbName,tableName,warmup,spinCount,dataSaveDir,outputFile,doSanitize,matches,exclude)
   public void runNonAcidBenchmarkswithnum() throws InterruptedException, TException, LoginException, IOException {
     //int startId = Integer.parseInt(args[1]);  //并发数
@@ -261,7 +263,9 @@ public class BenchmarkTool implements Runnable {
     long startTime = System.currentTimeMillis();
     for (int i = 1; i <= nThreads; i++) {
       System.out.println("start for thread" + Integer.toString(i));
-      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,host,port,confDir,instances,dbName+Integer.toString(i),tableName,warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile,doSanitize,matches,exclude);
+      NONACIDThread runnable =new NONACIDThread(cdl,endCdl,host,port,confDir,
+              instances,dbName+Integer.toString(i),tableName,tnum,nParameters,
+              warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile,doSanitize,matches,exclude);
       pool.execute(runnable);
       System.out.println("execute for thread" + Integer.toString(i));
     }
@@ -301,7 +305,6 @@ public class BenchmarkTool implements Runnable {
             () -> benchmarkRenameTable(bench, bData, 1))
         .add("dropDatabase",
             () -> benchmarkDropDatabase(bench, bData, 1));
-
     for (int howMany: instances) {
       suite.add("listTables" + '.' + howMany,
           () -> benchmarkListTables(bench, bData, howMany))

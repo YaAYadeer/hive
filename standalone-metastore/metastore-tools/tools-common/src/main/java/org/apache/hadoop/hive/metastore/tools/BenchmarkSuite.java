@@ -204,6 +204,7 @@ public final class BenchmarkSuite {
   private void displayStats(@NotNull Formatter fmt, @NotNull String name,
                             @NotNull DescriptiveStatistics stats) {
     double mean = stats.getMean();
+    // 标准差 stats.getStandardDeviation() / mean * 100
     double err = stats.getStandardDeviation() / mean * 100;
     long conv = scale.toNanos(1);
 
