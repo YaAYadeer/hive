@@ -78,8 +78,12 @@ public class NONACIDThread implements Runnable{
     
     public void setup() {
         for (int howMany: instances) {
-            suite.add()
-                    
+            suite.add("get_partitions_by_names" + '.' + howMany, () -> benchmarkGetPartitionsByName(bench, bData, howMany))
+                    .add("getTable", () -> benchmarkGetTable(bench, bData))
+                    .add("get_partition_names" + '.' + howMany, () -> benchmarkGetPartitionNames(bench, bData, howMany))
+                    .add("get_databases", () -> benchmarkListDatabases(bench, bData))
+                    .add("get_database",() -> benchmarkGetDatabase(bench, bData));
+            
         }
     }
     public void testcase() {

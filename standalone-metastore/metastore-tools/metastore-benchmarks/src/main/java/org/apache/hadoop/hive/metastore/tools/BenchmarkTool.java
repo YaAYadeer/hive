@@ -49,26 +49,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static org.apache.hadoop.hive.metastore.tools.Constants.HMS_DEFAULT_PORT;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkCreatePartition;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkCreatePartitions;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkDeleteCreate;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkDeleteWithPartitions;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkDropDatabase;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkDropPartition;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkDropPartitions;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkGetNotificationId;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkGetPartitionNames;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkGetPartitions;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkGetPartitionsByName;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkGetTable;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkListAllTables;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkListDatabases;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkListManyPartitions;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkListPartition;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkListTables;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkOpenTxns;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkRenameTable;
-import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.benchmarkTableCreate;
+import static org.apache.hadoop.hive.metastore.tools.HMSBenchmarks.*;
 import static org.apache.hadoop.hive.metastore.tools.Util.getServerUri;
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
@@ -89,7 +70,9 @@ public class BenchmarkTool implements Runnable {
   private enum RunModes {
     ACID,
     NONACID,
-    NONACIDWITHNUM,
+    PUTDATA,
+    TESTP,
+    NONPUTDATA,
     ALL
   }
   
@@ -198,7 +181,7 @@ public class BenchmarkTool implements Runnable {
       case NONACID:
         runNonAcidBenchmarks();
         break;
-      case NONACIDWITHNUM:
+      case NONPUTDATA:
         try {
           runNonAcidBenchmarkswithnum();
           break;
@@ -206,6 +189,8 @@ public class BenchmarkTool implements Runnable {
           e.printStackTrace();
           break;
         }
+      case TESTP:
+        runTestP();
       case ALL:
       default:
         runNonAcidBenchmarks();
@@ -346,6 +331,78 @@ public class BenchmarkTool implements Runnable {
         client.createDatabase(dbName);
       }
       
+      if (client.tableExists(dbName, tableName)) {
+        client.dropTable(dbName, tableName);
+      }
+
+      // Arrange various benchmarks in a suite
+      BenchmarkSuite result = suite.runMatching(matches, exclude);
+
+      Formatter fmt = new Formatter(sb);
+      // 展示为csv形式
+      if (doCSV) {
+        result.displayCSV(fmt, csvSeparator);
+      } else {
+        result.display(fmt);
+      }
+
+      PrintStream output = System.out;
+      if (outputFile != null) {
+        output = new PrintStream(outputFile);
+      }
+
+      if (outputFile != null) {
+        // Print results to stdout as well
+        StringBuilder s = new StringBuilder();
+        Formatter f = new Formatter(s);
+        result.display(f);
+        System.out.print(s);
+        f.close();
+      }
+
+      output.print(sb.toString());
+      fmt.close();
+      output.close();
+
+      if (dataSaveDir != null) {
+        saveData(result.getResult(), dataSaveDir, scale);
+      }
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+    }
+  }
+
+  private void runTestP() {
+    StringBuilder sb = new StringBuilder();
+    BenchData bData = new BenchData(dbName, tableName);
+    //BenchData bData2 = new BenchData(dbName, tableName);
+    
+    MicroBenchmark bench = new MicroBenchmark(warmup, spinCount);
+    BenchmarkSuite suite = new BenchmarkSuite();
+    
+    for (int howMany: instances) {
+      suite.add("testP1",
+              () -> benchmarkListTables1(bench, bData, howMany));
+    }
+
+    List<String> toRun = suite.listMatching(matches, exclude);
+    if (toRun.isEmpty()) {
+      return;
+    }
+    // list matching benchmarks
+    if (doList) {
+      toRun.forEach(System.out::println);
+      return;
+    }
+    LOG.info("Using table '{}.{}", dbName, tableName);
+
+    try (HMSClient client = new HMSClient(getServerUri(host, String.valueOf(port)), confDir)) {
+      bData.setClient(client);
+      // 创建指定数据库
+      if (!client.dbExists(dbName)) {
+        client.createDatabase(dbName);
+      }
+
       if (client.tableExists(dbName, tableName)) {
         client.dropTable(dbName, tableName);
       }
