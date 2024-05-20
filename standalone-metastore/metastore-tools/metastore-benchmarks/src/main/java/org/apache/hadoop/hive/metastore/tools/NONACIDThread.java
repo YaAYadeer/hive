@@ -77,13 +77,15 @@ public class NONACIDThread implements Runnable{
     
     
     public void setup() {
-        for (int howMany: instances) {
-            suite.add("get_partitions_by_names" + '.' + howMany, () -> benchmarkGetPartitionsByName(bench, bData, howMany))
-                    .add("getTable", () -> benchmarkGetTable(bench, bData))
-                    .add("get_partition_names" + '.' + howMany, () -> benchmarkGetPartitionNames(bench, bData, howMany))
-                    .add("get_databases", () -> benchmarkListDatabases(bench, bData))
-                    .add("get_database",() -> benchmarkGetDatabase(bench, bData))
-                    .add("create_table",() -> benchmarkCreateTable(bench, bData,howMany));
+        for (int howMany: instances) { 
+            suite.add("create_table",() -> benchmarkCreateTables(bench, bData,howMany));
+            
+//            suite.add("get_partitions_by_names" + '.' + howMany, () -> benchmarkGetPartitionsByName(bench, bData, howMany))
+//                    .add("getTable", () -> benchmarkGetTable(bench, bData))
+//                    .add("get_partition_names" + '.' + howMany, () -> benchmarkGetPartitionNames(bench, bData, howMany))
+//                    .add("get_databases", () -> benchmarkListDatabases(bench, bData))
+//                    .add("get_database",() -> benchmarkGetDatabase(bench, bData))
+//                    .add("create_table",() -> benchmarkCreateTables(bench, bData,howMany));
         }
     }
     public void testcase() {

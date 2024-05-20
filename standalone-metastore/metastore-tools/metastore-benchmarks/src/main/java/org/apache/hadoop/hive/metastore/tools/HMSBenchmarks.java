@@ -70,7 +70,7 @@ final class HMSBenchmarks {
 
   }
   // TODO 
-  static DescriptiveStatistics benchmarkCreateTable(@NotNull MicroBenchmark bench,
+  static DescriptiveStatistics benchmarkCreateTables(@NotNull MicroBenchmark bench,
                                                     @NotNull BenchData data,
                                                     int count) 
   {
