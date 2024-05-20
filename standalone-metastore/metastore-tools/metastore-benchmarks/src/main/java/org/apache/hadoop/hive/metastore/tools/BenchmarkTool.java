@@ -93,7 +93,7 @@ public class BenchmarkTool implements Runnable {
   private int[] instances = {100};
 
   @Option(names = {"-L", "--spin"}, description = "spin count")
-  private int spinCount = 100;
+  private int spinCount = 20;
 
   @Option(names = {"-W", "--warmup"}, description = "warmup count")
   private int warmup = 15;
