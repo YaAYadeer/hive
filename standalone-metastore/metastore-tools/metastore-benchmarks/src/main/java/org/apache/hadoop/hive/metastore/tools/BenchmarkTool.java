@@ -191,6 +191,7 @@ public class BenchmarkTool implements Runnable {
         }
       case TESTP:
         runTestP();
+        break;
       case ALL:
       default:
         runNonAcidBenchmarks();
