@@ -383,7 +383,7 @@ public class BenchmarkTool implements Runnable {
     
     for (int howMany: instances) {
       suite.add("testP1",
-              () -> benchmarkListTables1(bench, bData, howMany));
+              () -> benchmarkListTables(bench, bData, howMany));
     }
 
     List<String> toRun = suite.listMatching(matches, exclude);

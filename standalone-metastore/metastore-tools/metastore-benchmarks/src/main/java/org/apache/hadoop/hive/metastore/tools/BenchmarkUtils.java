@@ -20,6 +20,7 @@ package org.apache.hadoop.hive.metastore.tools;
 
 import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
+import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.TxnInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,8 @@ public class BenchmarkUtils {
 
   // howmany是表数量
   static void createManyTables(HMSClient client, int howMany, String dbName, String format) {
-    List<FieldSchema> columns = createSchema(Arrays.asList("name", "string"));
-    List<FieldSchema> partitions = createSchema(Arrays.asList("date", "string"));
+    List<FieldSchema> columns = createSchema(Arrays.asList("name", "age"));
+    List<FieldSchema> partitions = createSchema(Arrays.asList("id"));
     IntStream.range(0, howMany)
         .forEach(i ->
             throwingSupplierWrapper(() -> client.createTable(

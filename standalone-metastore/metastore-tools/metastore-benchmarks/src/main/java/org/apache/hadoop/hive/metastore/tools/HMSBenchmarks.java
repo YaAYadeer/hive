@@ -19,6 +19,7 @@
 package org.apache.hadoop.hive.metastore.tools;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.hadoop.hive.metastore.TableType;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.thrift.TException;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static org.apache.hadoop.hive.metastore.tools.Util.addManyPartitions;
 import static org.apache.hadoop.hive.metastore.tools.Util.addManyPartitionsNoException;
@@ -67,7 +69,24 @@ final class HMSBenchmarks {
     }
 
   }
-
+  // TODO 
+  static DescriptiveStatistics benchmarkCreateTable(@NotNull MicroBenchmark bench,
+                                                    @NotNull BenchData data,
+                                                    int count) 
+  {
+    final HMSClient client = data.getClient();
+    String dbName = data.dbName;
+    int SCALE_DEFAULT = 1;
+    // Create a bunch of tables
+    String format = "tmp_table_%d";
+    DescriptiveStatistics stats = new DescriptiveStatistics();
+    long start = System.nanoTime();
+    BenchmarkUtils.createManyTables(client, count, dbName, format);
+    long end = System.nanoTime();
+    stats.addValue((double)(end - start) / SCALE_DEFAULT);
+    return stats;
+  }
+  
   static DescriptiveStatistics benchmarkListAllTables(@NotNull MicroBenchmark benchmark,
                                                       @NotNull BenchData data) {
 
@@ -144,21 +163,6 @@ final class HMSBenchmarks {
       throwingSupplierWrapper(() -> client.dropTable(dbName, tableName));
     }
   }
-  // TODO 
-  static DescriptiveStatistics benchmarkCreateTable(@NotNull MicroBenchmark bench,
-                                                      @NotNull BenchData data
-  ) {
-    final HMSClient client = data.getClient();
-    String dbName = data.dbName;
-    String tableName = data.tableName;
-    BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
-    try {
-      return bench.measure(() ->
-              throwingSupplierWrapper(() -> client.getTable(dbName, tableName)));
-    } finally {
-      throwingSupplierWrapper(() -> client.dropTable(dbName, tableName));
-    }
-  }
   
   static DescriptiveStatistics benchmarkGetTable(@NotNull MicroBenchmark bench,
                                                  @NotNull BenchData data) {
@@ -192,18 +196,6 @@ final class HMSBenchmarks {
     }
   }
 
-  static DescriptiveStatistics benchmarkListTables1(@NotNull MicroBenchmark bench,
-                                                   @NotNull BenchData data,
-                                                   int count) {
-    final HMSClient client = data.getClient();
-    String dbName = data.dbName;
-
-    // Create a bunch of tables
-    String format = "tmp_table_%d";
-    BenchmarkUtils.createManyTables(client, count, dbName, format);
-    return bench.measure(() ->
-            throwingSupplierWrapper(() -> client.getAllTables(dbName, null)));
-  }
   
   static DescriptiveStatistics benchmarkCreatePartition(@NotNull MicroBenchmark bench,
                                                         @NotNull BenchData data) {
