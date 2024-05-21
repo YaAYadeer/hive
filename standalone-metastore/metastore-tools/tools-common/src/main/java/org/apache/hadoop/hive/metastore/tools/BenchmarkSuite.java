@@ -246,7 +246,7 @@ public final class BenchmarkSuite {
    */
   BenchmarkSuite display(Formatter fmt) {
     fmt.format("%-30s %-8s %-8s %-8s %-8s %-8s%n",
-        "Operation", "Mean", "Med", "Min", "Max", "Err%");
+        "Operation", "Mean", "Med", "Min", "Max", "C.V");
     result.forEach((name, stat) -> displayStats(fmt, name, stat));
     return this;
   }
@@ -260,7 +260,7 @@ public final class BenchmarkSuite {
   BenchmarkSuite displayCSV(Formatter fmt, String separator) {
     fmt.format("%s%s%s%s%s%s%s%s%s%s%s%n",
         "Operation", separator, "Mean", separator, "Med", separator, "Min",
-        separator, "Max", separator, "Err%");
+        separator, "Max", separator, "C.V");
     result.forEach((name, s) -> displayCSV(fmt, name, s, separator));
     return this;
   }

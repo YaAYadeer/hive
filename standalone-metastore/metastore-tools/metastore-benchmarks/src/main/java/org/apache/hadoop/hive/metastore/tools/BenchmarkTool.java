@@ -89,7 +89,7 @@ public class BenchmarkTool implements Runnable {
   @Option(names = {"-t", "--table"}, description = "table name")
   private String tableName = TEST_TABLE + "_" + System.getProperty("user.name");
 
-  @Option(names = {"-N", "--number"}, description = "number of object instances")
+  @Option(names = {"-PN", "--number"}, description = "number of object instances")
   private int[] instances = {100};
 
   @Option(names = {"-L", "--spin"}, description = "spin count")
@@ -132,7 +132,7 @@ public class BenchmarkTool implements Runnable {
   private Pattern[] exclude;
 
   @Option(names = {"-TN", "--tnumber"}, description = "num of table")
-  private int tnum;
+  private int tnum = 1;
 
   @Option(names = {"--runMode"},
       description = "flag for setting the mode for the benchmark, acceptable values are: ACID, NONACID, NONACIDWITHNUM ,ALL")

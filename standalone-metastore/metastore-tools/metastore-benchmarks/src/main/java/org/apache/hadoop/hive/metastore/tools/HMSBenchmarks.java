@@ -87,7 +87,7 @@ final class HMSBenchmarks {
     return stats;
   }
   // TODO
-  static DescriptiveStatistics benchmarkadd(@NotNull MicroBenchmark bench,
+  static DescriptiveStatistics benchmarkAddParation(@NotNull MicroBenchmark bench,
                                                              @NotNull BenchData data,
                                                              int howMany,
                                                              int nparams) {
@@ -97,7 +97,7 @@ final class HMSBenchmarks {
 
     // Create many parameters
     Map<String, String> parameters = new HashMap<>(nparams);
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < nparams; i++) {
       parameters.put(PARAM_KEY + i, PARAM_VALUE + i);
     }
 

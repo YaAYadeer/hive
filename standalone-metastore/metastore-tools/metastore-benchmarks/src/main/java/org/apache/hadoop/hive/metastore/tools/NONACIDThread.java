@@ -75,17 +75,18 @@ public class NONACIDThread implements Runnable{
         suite.setScale(TimeUnit.MILLISECONDS).doSanitize(doSanitize);
     }
     
-    
     public void setup() {
-        for (int howMany: instances) { 
-            suite.add("testadd",()->benchmarkadd(bench, bData, 1, 10));
-//            suite.add("create_table",() -> benchmarkCreateTables(bench, bData,howMany))
-//                    .add("get_partitions_by_names" + '.' + howMany, () -> benchmarkGetPartitionsByName(bench, bData, howMany))
-//                    .add("getTable", () -> benchmarkGetTable(bench, bData))
-//                    .add("get_partition_names" + '.' + howMany, () -> benchmarkGetPartitionNames(bench, bData, howMany))
-//                    .add("get_databases", () -> benchmarkListDatabases(bench, bData))
-//                    .add("get_database",() -> benchmarkGetDatabase(bench, bData))
-//                    .add("create_table",() -> benchmarkCreateTables(bench, bData,howMany));
+        //howmany是分区数   tnum是表数
+        for (int howMany: instances) {
+            suite.add("getTable", () -> benchmarkGetTable(bench, bData))
+                      .add("get_databases", () -> benchmarkListDatabases(bench, bData))
+                      .add("get_database",() -> benchmarkGetDatabase(bench, bData));
+                       
+//                    .add("create_table",() -> benchmarkCreateTables(bench, bData,tnum));
+//                    .add("testadd",()-> benchmarkAddParation(bench, bData,howMany, 2));             
+//                    .add("get_partitions_by_names" + '.' + howMany, () -> benchmarkGetPartitionsByName(bench, bData, howMany))             
+//                    .add("get_partition_names" + '.' + howMany, () -> benchmarkGetPartitionNames(bench, bData, howMany));
+
         }
     }
     public void testcase() {
