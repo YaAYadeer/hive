@@ -120,8 +120,9 @@ final class HMSBenchmarks {
     return bench.measure(
             () -> throwingSupplierWrapper(() -> {
               BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
-              addManyPartitions(client, dbName, tableName, parameters,
-                      Collections.singletonList("id"), howMany);}
+              addManyPartitions(client, dbName, tableName, parameters, Collections.singletonList("id"), howMany);
+              return true;
+            }
             ));
   }
   
