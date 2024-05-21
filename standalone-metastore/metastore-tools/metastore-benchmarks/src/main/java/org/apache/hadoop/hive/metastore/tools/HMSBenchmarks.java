@@ -86,6 +86,22 @@ final class HMSBenchmarks {
     stats.addValue((double)(end - start) / SCALE_DEFAULT);
     return stats;
   }
+  // TODO 
+  static DescriptiveStatistics benchmarkAddPartitions(@NotNull MicroBenchmark bench,
+                                                      @NotNull BenchData data) 
+  {
+    final HMSClient client = data.getClient();
+    String dbName = data.dbName;
+    String tableName = data.tableName;
+    BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
+    //client.getAllDatabases();
+    try {
+      return bench.measure(() ->
+              throwingSupplierWrapper(() -> client.getTable(dbName, tableName)));
+    } finally {
+      throwingSupplierWrapper(() -> client.dropTable(dbName, tableName));
+    }
+  }
   
   static DescriptiveStatistics benchmarkListAllTables(@NotNull MicroBenchmark benchmark,
                                                       @NotNull BenchData data) {
@@ -147,22 +163,6 @@ final class HMSBenchmarks {
         null);
   }
 
-  // TODO 
-  static DescriptiveStatistics benchmarkAddPartitions(@NotNull MicroBenchmark bench,
-                                                    @NotNull BenchData data
-  ) {
-    final HMSClient client = data.getClient();
-    String dbName = data.dbName;
-    String tableName = data.tableName;
-    BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
-    //client.getAllDatabases();
-    try {
-      return bench.measure(() ->
-              throwingSupplierWrapper(() -> client.getTable(dbName, tableName)));
-    } finally {
-      throwingSupplierWrapper(() -> client.dropTable(dbName, tableName));
-    }
-  }
   
   static DescriptiveStatistics benchmarkGetTable(@NotNull MicroBenchmark bench,
                                                  @NotNull BenchData data) {
