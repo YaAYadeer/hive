@@ -59,15 +59,7 @@ final class HMSBenchmarks {
                                                     @NotNull BenchData data) {
     final HMSClient client = data.getClient();
     String dbName = data.dbName;
-    throwingSupplierWrapper(() -> client.createDatabase(dbName));
-    try{
-      return benchmark.measure(() ->
-              throwingSupplierWrapper(() -> client.getDatabase(dbName)));
-    }
-    finally {
-      throwingSupplierWrapper(() -> client.dropDatabase(dbName));
-    }
-
+   return benchmark.measure(() -> throwingSupplierWrapper(() -> client.getDatabase(dbName)));
   }
   // TODO 
   static DescriptiveStatistics benchmarkCreateTables(@NotNull MicroBenchmark bench,

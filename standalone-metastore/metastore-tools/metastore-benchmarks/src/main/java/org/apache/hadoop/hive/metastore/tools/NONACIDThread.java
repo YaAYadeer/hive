@@ -79,14 +79,14 @@ public class NONACIDThread implements Runnable{
         //howmany是分区数   tnum是表数
         for (int howMany: instances) {
             suite.add("getTable", () -> benchmarkGetTable(bench, bData))
+                      .add("get_database",() -> benchmarkGetDatabase(bench, bData))
                       .add("get_databases", () -> benchmarkListDatabases(bench, bData))
-                      .add("get_database",() -> benchmarkGetDatabase(bench, bData));
-                       
+                      .add("get_partitions_by_names", () -> benchmarkGetPartitionsByName(bench, bData, howMany))
+                      .add("get_partition_names", () -> benchmarkGetPartitionNames(bench, bData, howMany));
 //                    .add("create_table",() -> benchmarkCreateTables(bench, bData,tnum));
 //                    .add("testadd",()-> benchmarkAddParation(bench, bData,howMany, 2));             
 //                    .add("get_partitions_by_names" + '.' + howMany, () -> benchmarkGetPartitionsByName(bench, bData, howMany))             
-//                    .add("get_partition_names" + '.' + howMany, () -> benchmarkGetPartitionNames(bench, bData, howMany));
-
+//
         }
     }
     public void testcase() {
