@@ -54,23 +54,6 @@ public class BenchmarkUtils {
                     .withSerde("org.apache.hadoop.hive.ql.io.orc.OrcSerde")
                     .build())));
   }
-
-  static void createManyTables1(HMSClient client, int howMany, String dbName, String format) {
-    List<FieldSchema> columns = createSchema(Arrays.asList("name", "string"));
-    List<FieldSchema> partitions = createSchema(Arrays.asList("date", "string","test","string"));
-    IntStream.range(0, howMany)
-            .forEach(i ->
-                    throwingSupplierWrapper(() -> client.createTable(
-                            new Util.TableBuilder(dbName, String.format(format, i))
-                                    .withType(TableType.MANAGED_TABLE)
-                                    .withColumns(columns)
-                                    .withPartitionKeys(partitions)
-                                    .withParameter("transactional","true")
-                                    .withInputFormat("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat")
-                                    .withOutputFormat("org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat")
-                                    .withSerde("org.apache.hadoop.hive.ql.io.orc.OrcSerde")
-                                    .build())));
-  }
   
   static void dropManyTables(HMSClient client, int howMany, String dbName, String format) {
     IntStream.range(0, howMany)

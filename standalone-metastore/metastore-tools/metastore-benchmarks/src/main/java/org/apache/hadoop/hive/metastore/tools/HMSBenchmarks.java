@@ -88,19 +88,41 @@ final class HMSBenchmarks {
   }
   // TODO 
   static DescriptiveStatistics benchmarkAddPartitions(@NotNull MicroBenchmark bench,
-                                                      @NotNull BenchData data) 
+                                                      @NotNull BenchData data, int pcount) 
   {
     final HMSClient client = data.getClient();
     String dbName = data.dbName;
     String tableName = data.tableName;
     BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
-    //client.getAllDatabases();
+    
     try {
       return bench.measure(() ->
               throwingSupplierWrapper(() -> client.getTable(dbName, tableName)));
     } finally {
       throwingSupplierWrapper(() -> client.dropTable(dbName, tableName));
     }
+  }
+
+  static DescriptiveStatistics benchmarkadd(@NotNull MicroBenchmark bench,
+                                                             @NotNull BenchData data,
+                                                             int howMany,
+                                                             int nparams) {
+    final HMSClient client = data.getClient();
+    String dbName = data.dbName;
+    String tableName = data.tableName;
+
+    // Create many parameters
+    Map<String, String> parameters = new HashMap<>(nparams);
+    for (int i = 0; i < 2; i++) {
+      parameters.put(PARAM_KEY + i, PARAM_VALUE + i);
+    }
+
+    return bench.measure(
+            () -> throwingSupplierWrapper(() -> {
+              BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
+              addManyPartitions(client, dbName, tableName, parameters,
+                      Collections.singletonList("id"), howMany);}
+            ));
   }
   
   static DescriptiveStatistics benchmarkListAllTables(@NotNull MicroBenchmark benchmark,

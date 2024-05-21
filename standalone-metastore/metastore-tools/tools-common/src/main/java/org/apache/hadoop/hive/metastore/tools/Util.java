@@ -572,6 +572,27 @@ public final class Util {
   }
 
   /**
+   * Add many partitions in one HMS call
+   *
+   * @param client      HMS Client
+   * @param dbName      database name
+   * @param tableName   table name
+   * @param arguments   list of partition names
+   * @param npartitions number of partitions to create
+   * @throws TException if fails to create partitions
+   */
+  static Object addManyPartitions(@NotNull HMSClient client,
+                                  @NotNull String dbName,
+                                  @NotNull String tableName,
+                                  @Nullable Map<String, String> parameters,
+                                  @NotNull List<String> arguments,
+                                  int npartitions) throws TException {
+    Table table = client.getTable(dbName, tableName);
+    client.addPartitions(createManyPartitions(table, parameters, arguments, npartitions));
+    return null;
+  }
+
+  /**
    * Create multiple partition objects.
    *
    * @param table
@@ -592,27 +613,6 @@ public final class Util {
                                             .map(a -> a + i)
                                             .collect(Collectors.toList())).build())
             .collect(Collectors.toList());
-  }
-
-  /**
-   * Add many partitions in one HMS call
-   *
-   * @param client      HMS Client
-   * @param dbName      database name
-   * @param tableName   table name
-   * @param arguments   list of partition names
-   * @param npartitions number of partitions to create
-   * @throws TException if fails to create partitions
-   */
-  static Object addManyPartitions(@NotNull HMSClient client,
-                                  @NotNull String dbName,
-                                  @NotNull String tableName,
-                                  @Nullable Map<String, String> parameters,
-                                  @NotNull List<String> arguments,
-                                  int npartitions) throws TException {
-    Table table = client.getTable(dbName, tableName);
-    client.addPartitions(createManyPartitions(table, parameters, arguments, npartitions));
-    return null;
   }
 
   static List<String> generatePartitionNames(@NotNull String prefix, int npartitions) {
