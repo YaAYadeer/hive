@@ -86,23 +86,7 @@ final class HMSBenchmarks {
     stats.addValue((double)(end - start) / SCALE_DEFAULT);
     return stats;
   }
-  // TODO 
-  static DescriptiveStatistics benchmarkAddPartitions(@NotNull MicroBenchmark bench,
-                                                      @NotNull BenchData data, int pcount) 
-  {
-    final HMSClient client = data.getClient();
-    String dbName = data.dbName;
-    String tableName = data.tableName;
-    BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
-    
-    try {
-      return bench.measure(() ->
-              throwingSupplierWrapper(() -> client.getTable(dbName, tableName)));
-    } finally {
-      throwingSupplierWrapper(() -> client.dropTable(dbName, tableName));
-    }
-  }
-
+  // TODO
   static DescriptiveStatistics benchmarkadd(@NotNull MicroBenchmark bench,
                                                              @NotNull BenchData data,
                                                              int howMany,
@@ -117,13 +101,21 @@ final class HMSBenchmarks {
       parameters.put(PARAM_KEY + i, PARAM_VALUE + i);
     }
 
-    return bench.measure(
-            () -> throwingSupplierWrapper(() -> {
-              BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
-              addManyPartitions(client, dbName, tableName, parameters, Collections.singletonList("id"), howMany);
-              return true;
-            }
-            ));
+    int SCALE_DEFAULT = 1;
+    // Create a bunch of tables
+    String format = "tmp_table_%d";
+    DescriptiveStatistics stats = new DescriptiveStatistics();
+    BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
+    long start = System.nanoTime();
+    try{
+      addManyPartitions(client, dbName, tableName, parameters, Collections.singletonList("id"), howMany);
+    }
+    catch (TException e) {
+      e.printStackTrace();
+    } 
+    long end = System.nanoTime();
+    stats.addValue((double)(end - start) / SCALE_DEFAULT);
+    return  stats;
   }
   
   static DescriptiveStatistics benchmarkListAllTables(@NotNull MicroBenchmark benchmark,
