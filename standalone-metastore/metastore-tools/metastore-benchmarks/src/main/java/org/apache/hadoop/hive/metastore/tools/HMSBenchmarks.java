@@ -81,12 +81,12 @@ final class HMSBenchmarks {
   // TODO
   static DescriptiveStatistics benchmarkAddParation(@NotNull MicroBenchmark bench,
                                                              @NotNull BenchData data,
+                                                             int tnum,
                                                              int howMany,
                                                              int nparams) {
     final HMSClient client = data.getClient();
     String dbName = data.dbName;
     String tableName = data.tableName;
-
     // Create many parameters
     Map<String, String> parameters = new HashMap<>(nparams);
     for (int i = 0; i < nparams; i++) {
@@ -97,10 +97,12 @@ final class HMSBenchmarks {
     // Create a bunch of tables
     String format = "tmp_table_%d";
     DescriptiveStatistics stats = new DescriptiveStatistics();
-    BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
+    //BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
     long start = System.nanoTime();
     try{
-      addManyPartitions(client, dbName, tableName, parameters, Collections.singletonList("id"), howMany);
+      for (int j = 0; j < tnum; j++) {
+        addManyPartitions(client, dbName, tableName+ Integer.toString(j), parameters, Collections.singletonList("id"), howMany);
+      }
     }
     catch (TException e) {
       e.printStackTrace();
