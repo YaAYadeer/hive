@@ -70,7 +70,8 @@ final class HMSBenchmarks {
     String dbName = data.dbName;
     int SCALE_DEFAULT = 1;
     // Create a bunch of tables
-    String format = "tmp_table_%d";
+    // String format = "tmp_table_%d";
+    String format = data.tableName + "_%d";
     DescriptiveStatistics stats = new DescriptiveStatistics();
     long start = System.nanoTime();
     BenchmarkUtils.createManyTables(client, count, dbName, format);
@@ -86,7 +87,7 @@ final class HMSBenchmarks {
                                                              int nparams) {
     final HMSClient client = data.getClient();
     String dbName = data.dbName;
-    String tableName = data.tableName;
+    String tableName = data.tableName + "_";
     // Create many parameters
     Map<String, String> parameters = new HashMap<>(nparams);
     for (int i = 0; i < nparams; i++) {
@@ -95,7 +96,6 @@ final class HMSBenchmarks {
 
     int SCALE_DEFAULT = 1;
     // Create a bunch of tables
-    String format = "tmp_table_%d";
     DescriptiveStatistics stats = new DescriptiveStatistics();
     //BenchmarkUtils.createPartitionedTable(client, dbName, tableName);
     long start = System.nanoTime();
