@@ -251,7 +251,7 @@ public class BenchmarkTool implements Runnable {
       System.out.println("start for thread" + Integer.toString(i));
       NONACIDThread runnable =new NONACIDThread(cdl,endCdl,host,port,confDir,
               instances,dbName+Integer.toString(i),tableName,tnum,nParameters,
-              warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile,doSanitize,matches,exclude);
+              warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile+Integer.toString(i),doSanitize,matches,exclude);
       pool.execute(runnable);
       System.out.println("execute for thread" + Integer.toString(i));
     }
