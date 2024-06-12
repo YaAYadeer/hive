@@ -39,6 +39,7 @@ public class NONACIDThread implements Runnable{
     // 表数 分区数
     private int[] instances;
     private int tnum;
+    private int casenum;
     private int[] nParameters;
     // 必备成员
     private BenchData bData;
@@ -56,7 +57,7 @@ public class NONACIDThread implements Runnable{
     
     public NONACIDThread(CountDownLatch startDownLatch, CountDownLatch endCountDownLatch,
                          String host,Integer port,String confDir,
-                         int[] instances, String dbName,String tableName,int tnum,int[] nParameters,
+                         int[] instances, String dbName,String tableName,int tnum,int casenum,int[] nParameters,
                          int warmup,int spinCount,String dataSaveDir,String outputFile, boolean doSanitize,Pattern[] matches,Pattern[] exclude) {
         this.startDownLatch = startDownLatch;
         this.endCountDownLatch = endCountDownLatch;
@@ -68,6 +69,7 @@ public class NONACIDThread implements Runnable{
         this.bData = new BenchData(dbName, tableName);
         this.bench = new MicroBenchmark(warmup, spinCount);
         this.tnum=tnum;
+        this.casenum=casenum;
         this.matches = matches;
         this.exclude = exclude;
         this.dataSaveDir=dataSaveDir;
@@ -75,16 +77,21 @@ public class NONACIDThread implements Runnable{
         suite.setScale(TimeUnit.MILLISECONDS).doSanitize(doSanitize);
     }
     
-    public void setup() {
+    public void setupget() {
         //howmany是分区数   tnum是表数
         for (int howMany: instances) {
             suite.add("getTable", () -> benchmarkGetTable(bench, bData))
                       .add("get_database",() -> benchmarkGetDatabase(bench, bData))
                       .add("get_databases", () -> benchmarkListDatabases(bench, bData))
                       .add("get_partitions_by_names", () -> benchmarkGetPartitionsByName(bench, bData, howMany))
-                      .add("get_partition_names", () -> benchmarkGetPartitionNames(bench, bData, howMany))
-                      .add("create_table",() -> benchmarkCreateTables(bench, bData,tnum))
-                      .add("add_paration",()-> benchmarkAddParation(bench, bData,tnum,howMany, 2));
+                      .add("get_partition_names", () -> benchmarkGetPartitionNames(bench, bData, howMany));
+        }
+    }
+    public void setupcreate() {
+        //howmany是分区数   tnum是表数
+        for (int howMany: instances) {
+            suite.add("create_table",() -> benchmarkCreateTables(bench, bData,tnum))
+                    .add("add_paration",()-> benchmarkAddParation(bench, bData,tnum,howMany, 2));
         }
     }
     public void testcase() {
@@ -139,7 +146,14 @@ public class NONACIDThread implements Runnable{
                 startDownLatch.countDown();
             }
             startDownLatch.await();
-            setup();
+            switch(casenum){
+                case 1 :
+                    setupget();
+                    break; 
+                case 2:
+                    setupcreate();
+                    break; 
+            }
             testcase();
         } catch (InterruptedException e) {
             e.printStackTrace();

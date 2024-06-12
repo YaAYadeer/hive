@@ -134,6 +134,9 @@ public class BenchmarkTool implements Runnable {
   @Option(names = {"-TN", "--tnumber"}, description = "num of table")
   private int tnum = 1;
 
+  @Option(names = {"-CASE", "--case"}, description = "case num")
+  private int casenum = 1;
+
   @Option(names = {"--runMode"},
       description = "flag for setting the mode for the benchmark, acceptable values are: ACID, NONACID, NONACIDWITHNUM ,ALL")
   private RunModes runMode = RunModes.ALL;
@@ -250,7 +253,7 @@ public class BenchmarkTool implements Runnable {
     for (int i = 1; i <= nThreads; i++) {
       System.out.println("start for thread" + Integer.toString(i));
       NONACIDThread runnable =new NONACIDThread(cdl,endCdl,host,port,confDir,
-              instances,dbName+Integer.toString(i),tableName,tnum,nParameters,
+              instances,dbName+Integer.toString(i),tableName,tnum,casenum,nParameters,
               warmup,spinCount,dataSaveDir+Integer.toString(i),outputFile+Integer.toString(i),doSanitize,matches,exclude);
       pool.execute(runnable);
       System.out.println("execute for thread" + Integer.toString(i));
