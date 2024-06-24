@@ -141,19 +141,19 @@ public class NONACIDThread implements Runnable{
     //  每个thread创建的 db 和table得区分开，结果文件怎么输出？是每个线程的均值，还是线程和？
     //  run操作类型
     public void run() {
+        switch(casenum){
+            case 1 :
+                setupget();
+                break;
+            case 2:
+                setupcreate();
+                break;
+        }
         try {
             synchronized (startDownLatch) {
                 startDownLatch.countDown();
             }
             startDownLatch.await();
-            switch(casenum){
-                case 1 :
-                    setupget();
-                    break; 
-                case 2:
-                    setupcreate();
-                    break; 
-            }
             testcase();
         } catch (InterruptedException e) {
             e.printStackTrace();
