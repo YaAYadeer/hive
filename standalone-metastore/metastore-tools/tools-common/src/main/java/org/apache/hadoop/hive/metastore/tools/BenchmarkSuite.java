@@ -127,8 +127,11 @@ public final class BenchmarkSuite {
       });
     } else {
       names.forEach(name -> {
-        LOG.info("Running benchmark {}", name);
+        System.out.println("Running benchmark" + name);
+        long startTime = System.currentTimeMillis();
         result.put(name, suite.get(name).get());
+        long endTime = System.currentTimeMillis();
+        System.out.println("Taken time: " + (endTime - startTime) + " ms");
       });
     }
     return this;
