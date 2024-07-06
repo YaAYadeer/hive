@@ -26,8 +26,8 @@ public class TestCreate {
                 System.out.println("Thread" + i);
                 System.out.println("Start to make sure dbExists");
                 try (HMSClient client = new HMSClient(getServerUri(args[0], "9083"), "")) {
-                    if (!client.dbExists(args[1])) {
-                        String dbName = args[1] + i;
+                    String dbName = args[1] + i;
+                    if (!client.dbExists(dbName)) {
                         System.out.println("=start  to createDatabase " + dbName);
                         client.createDatabase(dbName);
                         System.out.println("end to createDatabase " + dbName);
