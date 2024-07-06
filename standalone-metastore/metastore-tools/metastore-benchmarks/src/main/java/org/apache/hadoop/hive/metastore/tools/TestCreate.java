@@ -22,11 +22,12 @@ public class TestCreate {
             parameters.put("key" + i, "value" + i);
         }
         for (int i = 1; i <= Integer.parseInt(args[2]); i++) {
+            int finalI = i;
             new Thread(() -> {
-                System.out.println("Thread" + i);
+                System.out.println("Thread" + finalI);
                 System.out.println("Start to make sure dbExists");
                 try (HMSClient client = new HMSClient(getServerUri(args[0], "9083"), "")) {
-                    String dbName = args[1] + i;
+                    String dbName = args[1] + finalI;
                     if (!client.dbExists(dbName)) {
                         System.out.println("=start  to createDatabase " + dbName);
                         client.createDatabase(dbName);
