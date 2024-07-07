@@ -29,7 +29,7 @@ public class TestCreate {
                 try (HMSClient client = new HMSClient(getServerUri(args[0], "9083"), "")) {
                     String dbName = args[1] + finalI;
                     if (!client.dbExists(dbName)) {
-                        System.out.println("=start  to createDatabase " + dbName);
+                        System.out.println("start  to createDatabase " + dbName);
                         client.createDatabase(dbName);
                         System.out.println("end to createDatabase " + dbName);
                         for (int j = 0; j < 1000; j++) {
